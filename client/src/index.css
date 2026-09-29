@@ -1,0 +1,449 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-void: #04070d;
+  --color-abyss: #070c16;
+  --color-hull: #0b1320;
+  --color-panel: #0d1725;
+  --color-edge: #1b2b3f;
+  --color-ink: #e8f1fa;
+  --color-muted: #90a4bd;
+  --color-faint: #5d7590;
+  --color-cyan: #38e1ff;
+  --color-cyan-dim: #1b7f96;
+  --color-amber: #ffb648;
+  --color-alarm: #ff4655;
+  --color-mint: #4ade80;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', 'Noto Sans Devanagari',
+    'Noto Sans Tamil', 'Noto Sans Telugu', 'Noto Sans Kannada', 'Noto Sans Malayalam', 'Noto Sans Oriya',
+    'Noto Sans Gujarati', 'Noto Sans Bengali', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  --radius-panel: 14px;
+}
+
+@layer base {
+  * {
+    border-color: color-mix(in oklab, var(--color-cyan) 12%, transparent);
+  }
+
+  html {
+    color-scheme: dark;
+    scrollbar-color: var(--color-edge) transparent;
+  }
+
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background:
+      radial-gradient(1100px 620px at 12% -8%, rgba(56, 225, 255, 0.09), transparent 62%),
+      radial-gradient(900px 520px at 96% 4%, rgba(88, 120, 255, 0.07), transparent 58%),
+      var(--color-void);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-cyan) 34%, transparent);
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Native select popups stay legible on the dark surface. */
+  select option {
+    background: var(--color-panel);
+    color: var(--color-ink);
+  }
+}
+
+@layer components {
+  .panel {
+    background: color-mix(in oklab, var(--color-panel) 86%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-cyan) 11%, transparent);
+    border-radius: var(--radius-panel);
+    backdrop-filter: blur(14px) saturate(130%);
+  }
+
+  .panel-inset {
+    background: color-mix(in oklab, var(--color-void) 55%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-cyan) 8%, transparent);
+    border-radius: 10px;
+  }
+
+  /* Small uppercase technical caption used above every panel. */
+  .tech-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.2;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .tech-value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--color-ink);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 10px;
+    border: 1px solid color-mix(in oklab, var(--color-cyan) 20%, transparent);
+    background: color-mix(in oklab, var(--color-hull) 80%, transparent);
+    padding: 0.55rem 0.9rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease,
+      transform 140ms ease,
+      color 140ms ease;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--color-cyan) 12%, var(--color-hull));
+    border-color: color-mix(in oklab, var(--color-cyan) 45%, transparent);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: linear-gradient(180deg, color-mix(in oklab, var(--color-cyan) 88%, white 6%), var(--color-cyan));
+    border-color: transparent;
+    color: #041018;
+    font-weight: 650;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #7aeaff, var(--color-cyan));
+    border-color: transparent;
+  }
+
+  .btn-sos {
+    background: color-mix(in oklab, var(--color-alarm) 16%, var(--color-hull));
+    border-color: color-mix(in oklab, var(--color-alarm) 55%, transparent);
+    color: #ffb3ba;
+  }
+
+  .btn-sos:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--color-alarm) 30%, var(--color-hull));
+    border-color: var(--color-alarm);
+    color: #fff;
+  }
+
+  .btn-ghost {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-muted);
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    color: var(--color-ink);
+    background: color-mix(in oklab, var(--color-cyan) 10%, transparent);
+  }
+
+  .field {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid color-mix(in oklab, var(--color-cyan) 14%, transparent);
+    background: color-mix(in oklab, var(--color-void) 60%, transparent);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.95rem;
+    transition: border-color 140ms ease;
+  }
+
+  .field::placeholder {
+    color: color-mix(in oklab, var(--color-muted) 70%, transparent);
+  }
+
+  .field:focus {
+    border-color: color-mix(in oklab, var(--color-cyan) 55%, transparent);
+    outline: none;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-cyan) 18%, transparent);
+    padding: 0.15rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* Handset frame: phone aspect ratio, bezel, notch and home indicator.
+     The screen inside uses the Android app's palette (near-black + green accent). */
+  .phone {
+    --ph-bg: #0a0e13;
+    --ph-card: #161c23;
+    --ph-card-2: #1d242c;
+    --ph-accent: #2ee07f;
+    --ph-accent-ink: #052a15;
+    --ph-alarm: #ff4655;
+    --ph-muted: #8a97a6;
+    /* Height-driven so the whole handset fits the viewport; width follows the phone ratio. */
+    height: 100%;
+    max-height: 800px;
+    min-height: 0;
+    aspect-ratio: 9 / 18.5;
+    width: auto;
+    max-width: 100%;
+    /* The frame's own metrics stay in px: cqw only resolves for descendants of the container. */
+    border-radius: 38px;
+    container-type: inline-size;
+    border: 1px solid color-mix(in oklab, var(--ph-accent) 22%, transparent);
+    background: var(--ph-bg);
+    color: #f2f6f9;
+    box-shadow:
+      0 0 0 6px #0a1019,
+      0 0 0 7px color-mix(in oklab, var(--color-cyan) 14%, transparent),
+      0 24px 60px -24px rgba(0, 0, 0, 0.9),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    transition: box-shadow 220ms ease;
+  }
+
+  .phone-highlight {
+    box-shadow:
+      0 0 0 6px #0a1019,
+      0 0 0 7px color-mix(in oklab, var(--color-cyan) 60%, transparent),
+      0 0 40px -6px color-mix(in oklab, var(--color-cyan) 45%, transparent),
+      0 24px 60px -24px rgba(0, 0, 0, 0.9);
+  }
+
+  .phone-speaking {
+    box-shadow:
+      0 0 0 6px #0a1019,
+      0 0 0 7px color-mix(in oklab, var(--color-cyan) 40%, transparent),
+      0 0 32px -4px color-mix(in oklab, var(--color-cyan) 35%, transparent),
+      0 24px 60px -24px rgba(0, 0, 0, 0.9);
+  }
+
+  .phone-notch {
+    position: absolute;
+    top: 2cqw;
+    left: 50%;
+    width: 24cqw;
+    height: 5.2cqw;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: #05080e;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+  }
+
+  .ph-card {
+    background: var(--ph-card);
+    border-radius: 5.5cqw;
+  }
+
+  .ph-label {
+    font-family: var(--font-sans);
+    font-size: max(9px, 2.4cqw);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ph-muted);
+  }
+
+  .ph-mono {
+    font-family: var(--font-mono);
+    font-size: max(8px, 2cqw);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ph-muted);
+    line-height: 1.6;
+  }
+
+  .ph-accent {
+    color: var(--ph-accent);
+  }
+
+  .ph-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--ph-accent) 35%, transparent);
+    background: var(--ph-card-2);
+    color: var(--ph-accent);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition:
+      background-color 140ms ease,
+      transform 140ms ease,
+      box-shadow 140ms ease;
+  }
+
+  .ph-btn:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--ph-accent) 14%, var(--ph-card-2));
+  }
+
+  .ph-btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .ph-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .ph-btn-filled {
+    background: var(--ph-accent);
+    border-color: transparent;
+    color: var(--ph-accent-ink);
+  }
+
+  .ph-btn-filled:hover:not(:disabled) {
+    background: #4cf094;
+  }
+
+  .ph-ptt {
+    position: relative;
+    width: clamp(96px, min(36cqw, 20vh), 170px);
+    height: clamp(96px, min(36cqw, 20vh), 170px);
+    font-size: max(11px, 3.2cqw);
+    border-radius: 999px;
+    background: var(--ph-accent);
+    color: var(--ph-accent-ink);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    box-shadow: 0 0 0 3.5cqw var(--ph-bg), 0 0 0 calc(3.5cqw + 1px) color-mix(in oklab, var(--ph-accent) 40%, transparent);
+    transition:
+      transform 120ms ease,
+      box-shadow 160ms ease,
+      background-color 160ms ease;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .ph-ptt:active,
+  .ph-ptt[data-listening='true'] {
+    transform: scale(0.97);
+    background: #ff4655;
+    color: #fff;
+    box-shadow: 0 0 0 14px var(--ph-bg), 0 0 0 15px rgba(255, 70, 85, 0.6), 0 0 44px rgba(255, 70, 85, 0.45);
+  }
+
+  .ph-ptt:disabled {
+    background: color-mix(in oklab, var(--ph-accent) 30%, var(--ph-card));
+    color: var(--ph-muted);
+    cursor: not-allowed;
+  }
+
+  .ph-field {
+    width: 100%;
+    border-radius: 6cqw;
+    border: 1px solid transparent;
+    background: var(--ph-card);
+    color: #f2f6f9;
+    padding: 2.4cqw 11cqw 2.4cqw 4cqw;
+    font-size: max(13px, 3.6cqw);
+    line-height: 1.35;
+    resize: none;
+  }
+
+  .ph-field::placeholder {
+    color: var(--ph-muted);
+  }
+
+  .ph-field:focus {
+    outline: none;
+    border-color: color-mix(in oklab, var(--ph-accent) 55%, transparent);
+  }
+
+  .ph-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: max(36px, 11cqw);
+    height: max(36px, 11cqw);
+    border-radius: 999px;
+    background: var(--ph-card);
+    color: var(--ph-accent);
+    cursor: pointer;
+    transition: background-color 140ms ease;
+  }
+
+  .ph-icon-btn:hover {
+    background: var(--ph-card-2);
+  }
+
+  .ph-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    background: color-mix(in oklab, var(--ph-bg) 96%, transparent);
+    backdrop-filter: blur(6px);
+    padding: 3.2rem 1.1rem 1.4rem;
+    overflow-y: auto;
+  }
+
+  .phone-home {
+    margin: 0 auto 8px;
+    width: 96px;
+    height: 4px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-ink) 28%, transparent);
+  }
+
+  .hairline {
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--color-cyan) 30%, transparent), transparent);
+    height: 1px;
+  }
+}
+
+/* Global motion opt-out. Components additionally gate their own variants. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
