@@ -19,6 +19,7 @@ registerProcessor('itantra-capture', Capture);
 `;
 
 import { hubOnline } from './hub.ts';
+import { apiUrl } from './config.ts';
 
 export const TARGET_RATE = 16000;
 
@@ -192,7 +193,7 @@ export async function transcribeOnHub(samples: Float32Array, lang: string): Prom
   }
   let response: Response;
   try {
-    response = await fetch(`/api/stt?lang=${lang}`, {
+    response = await fetch(apiUrl(`/api/stt?lang=${lang}`), {
       method: 'POST',
       headers: { 'content-type': 'application/octet-stream' },
       body: samples.buffer.slice(samples.byteOffset, samples.byteOffset + samples.byteLength) as ArrayBuffer,

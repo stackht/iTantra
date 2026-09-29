@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import { createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { copyFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
@@ -48,11 +48,31 @@ function manifestPath(lang: LanguageCode): string {
   return join(MODELS_DIR, lang, 'manifest.json');
 }
 
+/**
+ * Manifest paths are stored relative to the voice folder so a models directory can be
+ * copied between machines (and into a container). Older manifests hold absolute paths;
+ * those are rebased onto the current voice folder by their part after `tts/<lang>/`.
+ */
+function resolveVoicePath(lang: LanguageCode, stored: string): string {
+  const dir = join(MODELS_DIR, lang);
+  if (!isAbsolute(stored)) return join(dir, stored);
+  if (existsSync(stored)) return stored;
+  const parts = stored.split(/[\\/]+/);
+  const at = parts.lastIndexOf(lang);
+  return at >= 0 ? join(dir, ...parts.slice(at + 1)) : stored;
+}
+
 export function readManifest(lang: LanguageCode): VoiceManifest | null {
   try {
     const path = manifestPath(lang);
     if (!existsSync(path)) return null;
-    const manifest = JSON.parse(readFileSync(path, 'utf8')) as VoiceManifest;
+    const raw = JSON.parse(readFileSync(path, 'utf8')) as VoiceManifest;
+    const manifest: VoiceManifest = {
+      ...raw,
+      model: resolveVoicePath(lang, raw.model),
+      tokens: resolveVoicePath(lang, raw.tokens),
+      dataDir: resolveVoicePath(lang, raw.dataDir),
+    };
     return existsSync(manifest.model) && existsSync(manifest.tokens) ? manifest : null;
   } catch {
     return null;
@@ -183,7 +203,11 @@ export async function installVoice(lang: LanguageCode, log: (line: string) => vo
       installedAt: Date.now(),
       source,
     };
-    writeFileSync(manifestPath(lang), JSON.stringify(manifest, null, 2));
+    // Store portable relative paths; readManifest resolves them against the voice folder.
+    writeFileSync(
+      manifestPath(lang),
+      JSON.stringify({ ...manifest, model: relative(target, model), tokens: relative(target, tokens), dataDir: relative(target, dataDir) }, null, 2),
+    );
     set(1, 'Installed');
     log(`[voices] ${lang}: installed ${pack.label} (${(statSync(model).size / 1e6).toFixed(1)} MB)`);
     return manifest;

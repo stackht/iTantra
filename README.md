@@ -192,13 +192,45 @@ Copy `.env.example` to `.env` (Vite reads `VITE_*`; the hub reads the rest).
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `VITE_WS_URL` | *(empty)* | Hub WebSocket URL. Empty = `ws://<current host>:8787/ws` |
+| `VITE_HUB_URL` | *(empty)* | Hub origin for a frontend hosted elsewhere. Empty = same origin (`/api`, `/ws`). A `?hub=https://…` link parameter overrides it at runtime |
+| `VITE_WS_URL` | *(empty)* | Hub WebSocket URL. Empty = derived from the hub URL |
 | `VITE_DEMO_MODE` | `false` | `true` never contacts the hub and runs the engine in-tab |
 | `VITE_TRANSLATION_PROVIDER` | `mymemory` | Fallback after the product's Opus-MT: `mymemory` = demo dataset → remote MT; `mock` = demo dataset only |
 | `TRANSLATION_PROVIDER` | `mymemory` | Hub's own chain for packets that arrive untranslated |
 | `PORT` | `8787` | Hub port |
+| `CORS_ORIGINS` | `*` | Origins allowed to call the hub API from another domain (comma list) |
+| `ITANTRA_ANDROID_DIR` | `D:\Projects\ITANTRA` | Android checkout the models are read from |
 
 No API keys are used or committed.
+
+## 9a. Deployment (free, no card)
+
+The models need about 3 GB of RAM (measured 2.83 GB with everything loaded). No free, card-free
+host offers that, so the prototype is deployed in two parts:
+
+| Part | Where | Cost |
+| --- | --- | --- |
+| Frontend (the two phones) | Cloudflare Pages, `https://itantra.pages.dev`, built from this repo on every push to `main` | free |
+| Hub with all ITANTRA models | This PC, published through a Cloudflare quick tunnel | free |
+
+To go live, on the PC that has the models:
+
+```bash
+npm run share
+```
+
+It builds the app, starts the hub, opens the tunnel, and prints the link to share, for example
+`https://itantra.pages.dev/?hub=https://<random>.trycloudflare.com`. The Pages site remembers the
+hub from that link. The tunnel address changes every run, so share the new link each time.
+While the PC is off, the Pages site still opens and runs its built-in demo mode (typed text,
+demo phrases).
+
+Pages build settings: build command `npm ci && npm run build:pages`, output `client/dist`,
+`NODE_VERSION=22.16.0`.
+
+**Paid alternative (one always-on URL).** `npm run image:build` produces a single Docker image
+(3.8 GB) with the web app, hub and all models, tested locally. It runs on any Docker host with
+≥ 4 GB RAM, e.g. Railway Hobby or Hugging Face Spaces with PRO.
 
 ## 10. Product models (from the ITANTRA Android project)
 

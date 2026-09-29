@@ -5,7 +5,7 @@ import {
   type TranslationEngine,
   type TranslationResult,
 } from '@itantra/shared';
-import { TRANSLATION_PROVIDER } from './config.ts';
+import { TRANSLATION_PROVIDER, apiUrl } from './config.ts';
 import { hubOnline } from './hub.ts';
 
 /**
@@ -25,7 +25,7 @@ class ProductMtEngine implements TranslationEngine {
       return { text: trimmed, sourceLanguage, targetLanguage, engine: this.name, resolution: 'unavailable', note: 'Hub offline — Opus-MT runs on the hub' };
     }
     try {
-      const response = await fetch('/api/mt', {
+      const response = await fetch(apiUrl('/api/mt'), {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ text: trimmed, src: sourceLanguage, tgt: targetLanguage }),
@@ -67,7 +67,7 @@ class GatedMarathiEngine implements TranslationEngine {
       return { text: trimmed, sourceLanguage, targetLanguage, engine: this.name, resolution: 'unavailable', note: 'Only for Marathi→English on the hub' };
     }
     try {
-      const response = await fetch('/api/mt', {
+      const response = await fetch(apiUrl('/api/mt'), {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ text: trimmed, src: 'mr', tgt: 'en', allowGated: true }),

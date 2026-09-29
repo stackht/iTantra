@@ -26,7 +26,7 @@ import {
   type SignalStage,
   type SosState,
 } from '@itantra/shared';
-import { TRANSLATION_PROVIDER } from '../lib/config.ts';
+import { TRANSLATION_PROVIDER, apiUrl } from '../lib/config.ts';
 import { playAlarm } from '../lib/audio.ts';
 import { translateFromPivot, translateOnDevice } from '../lib/clientTranslation.ts';
 import { fetchNeuralVoices, rememberReadiness, requestVoiceInstall, type NeuralVoiceState } from '../lib/neuralTts.ts';
@@ -775,7 +775,7 @@ export const useStore = create<AppState>((set, get) => ({
       return;
     }
     try {
-      const response = await fetch('/api/models', { cache: 'no-store' });
+      const response = await fetch(apiUrl('/api/models'), { cache: 'no-store' });
       if (!response.ok) throw new Error(String(response.status));
       set({ productModels: (await response.json()) as ProductModels });
     } catch {

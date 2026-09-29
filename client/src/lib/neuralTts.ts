@@ -1,4 +1,5 @@
 import type { LanguageCode } from '@itantra/shared';
+import { apiUrl } from './config.ts';
 
 /**
  * Client for the hub's neural voice API (sherpa-onnx Piper/VITS voices — the
@@ -32,7 +33,7 @@ export function rememberReadiness(states: Record<string, NeuralVoiceState>): voi
 
 export async function fetchNeuralVoices(): Promise<{ runtime: boolean; voices: Record<string, NeuralVoiceState> } | null> {
   try {
-    const response = await fetch('/api/tts/voices', { cache: 'no-store' });
+    const response = await fetch(apiUrl('/api/tts/voices'), { cache: 'no-store' });
     if (!response.ok) return null;
     const body = (await response.json()) as { runtime: boolean; voices: Record<string, NeuralVoiceState> };
     rememberReadiness(body.voices);
@@ -45,7 +46,7 @@ export async function fetchNeuralVoices(): Promise<{ runtime: boolean; voices: R
 
 export async function requestVoiceInstall(lang: LanguageCode): Promise<boolean> {
   try {
-    const response = await fetch('/api/tts/install', {
+    const response = await fetch(apiUrl('/api/tts/install'), {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ lang }),
@@ -66,7 +67,7 @@ export interface NeuralAudio {
 /** Fetches a WAV for the text; the caller owns (and revokes) the object URL. */
 export async function synthesizeNeural(text: string, lang: LanguageCode): Promise<NeuralAudio | null> {
   try {
-    const response = await fetch(`/api/tts?lang=${lang}&text=${encodeURIComponent(text)}`);
+    const response = await fetch(apiUrl(`/api/tts?lang=${lang}&text=${encodeURIComponent(text)}`));
     if (!response.ok) return null;
     const blob = await response.blob();
     return {

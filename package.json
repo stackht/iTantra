@@ -22,7 +22,12 @@
     "dev:client:lan": "npm run dev:lan --workspace client",
     "voices:install": "tsx server/scripts/install-voices.ts",
     "stt:install": "tsx server/scripts/install-stt.ts",
-    "models:install": "npm run stt:install && npm run voices:install -- en hi mr"
+    "models:install": "npm run stt:install && npm run voices:install -- en hi mr",
+    "models:stage": "tsx server/scripts/stage-models.ts",
+    "image:build": "npm run models:stage && docker build -t ghcr.io/stackht/itantra:latest .",
+    "image:push": "docker push ghcr.io/stackht/itantra:latest",
+    "build:pages": "npm run build --workspace client",
+    "share": "tsx server/scripts/share.ts"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

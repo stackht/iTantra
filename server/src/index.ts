@@ -15,6 +15,22 @@ import { ANDROID_DIR } from './models/paths.ts';
 const here = dirname(fileURLToPath(import.meta.url));
 const CLIENT_DIST = resolve(here, '../../client/dist');
 const PORT = Number(process.env.PORT ?? 8787);
+/** Origins allowed to call the API from another domain (comma list, or * for any). */
+const CORS_ORIGINS = (process.env.CORS_ORIGINS ?? '*').split(',').map((o) => o.trim()).filter(Boolean);
+
+function applyCors(req: IncomingMessage, res: ServerResponse): void {
+  const origin = req.headers.origin;
+  if (!origin) return;
+  const allowed = CORS_ORIGINS.includes('*') || CORS_ORIGINS.includes(origin);
+  if (!allowed) return;
+  res.setHeader('access-control-allow-origin', CORS_ORIGINS.includes('*') ? '*' : origin);
+  res.setHeader('vary', 'origin');
+  res.setHeader('access-control-allow-methods', 'GET, POST, OPTIONS');
+  res.setHeader('access-control-allow-headers', 'content-type');
+  // The phones read these to label the neural voice and its synthesis time.
+  res.setHeader('access-control-expose-headers', 'x-itantra-voice, x-itantra-synthesis-ms, x-itantra-duration-ms, x-itantra-cached');
+  res.setHeader('access-control-max-age', '600');
+}
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -173,6 +189,12 @@ async function serveApi(req: IncomingMessage, res: ServerResponse, url: URL): Pr
 
 async function serve(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const url = new URL(req.url ?? '/', 'http://localhost');
+  applyCors(req, res);
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
   if (url.pathname === '/healthz') {
     json(res, 200, { ok: true, service: 'itantra-hub', ws: '/ws', neuralTts: neuralRuntimeAvailable() });
     return;
